@@ -1,35 +1,56 @@
 #include "function.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-
-
-int main(int argc, char *argv[]){
-
-    if (argc<2) {
-    printf("Usage: todo <command> [arguments]");
-    return 0;
-    }
-    else if ((argv[1][0] == '-' && argv[1][1]=='a' && argv[1][2] =='\0')|| strcmp(argv[1],"--add")== 0) {
-    add(argv,argc);
-    }
-    else if ((argv[1][0] == '-' &&argv[1][1] == 'l' && argv[1][2] =='\0')|| strcmp(argv[1],"--list")== 0) {
-    list();
-    }
-    else if ((argv[1][0] == '-' && argv[1][1] == 'c' && argv[1][2] =='\0')|| strcmp(argv[1],"--clear")==0) {
-    clear();
-    }
-    else if ((argv[1][0] == '-' && argv[1][1] == 'h' && argv[1][2] =='\0')|| strcmp(argv[1],"--help")==0){
-    help();
-    }
-    else if ((argv[1][0] == '-' && argv[1][1] == 'r' && argv[1][2] =='\0')|| strcmp(argv[1],"--remove")==0) {
-    removefromlist(argv[2]);
-    }
-    else if((argv[1][0] == '-' && argv[1][1] == 'd'  && argv[1][2] == '\0')|| strcmp(argv[1],"--done")==0){
-    done(argv[2]);
-    }
-    
-    return 0;
+static void print_usage(void) {
+    printf("Usage: todo <command> [arguments]\n");
+    printf("Try 'todo --help' for more information.\n");
 }
 
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        print_usage();
+        return 1;
+    }
 
+    const char *cmd = argv[1];
+
+    if ((cmd[0] == '-' && cmd[1] == 'a' && cmd[2] == '\0') || strcmp(cmd, "--add") == 0) {
+        if (argc < 3) {
+            fprintf(stderr, "todo: missing task text for --add\n");
+            return 1;
+        }
+        add(argv, argc);
+    }
+    else if ((cmd[0] == '-' && cmd[1] == 'l' && cmd[2] == '\0') || strcmp(cmd, "--list") == 0) {
+        list();
+    }
+    else if ((cmd[0] == '-' && cmd[1] == 'c' && cmd[2] == '\0') || strcmp(cmd, "--clear") == 0) {
+        clear();
+    }
+    else if ((cmd[0] == '-' && cmd[1] == 'h' && cmd[2] == '\0') || strcmp(cmd, "--help") == 0) {
+        help();
+    }
+    else if ((cmd[0] == '-' && cmd[1] == 'r' && cmd[2] == '\0') || strcmp(cmd, "--remove") == 0) {
+        if (argc < 3) {
+            fprintf(stderr, "todo: missing id for --remove\n");
+            return 1;
+        }
+        return removefromlist(argv[2]);
+    }
+    else if ((cmd[0] == '-' && cmd[1] == 'd' && cmd[2] == '\0') || strcmp(cmd, "--done") == 0) {
+        if (argc < 3) {
+            fprintf(stderr, "todo: missing id for --done\n");
+            return 1;
+        }
+        done(argv[2]);
+    }
+    else {
+        fprintf(stderr, "todo: unknown command '%s'\n", cmd);
+        print_usage();
+        return 1;
+    }
+
+    return 0;
+}
